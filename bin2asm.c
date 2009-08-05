@@ -35,7 +35,7 @@ static void usage()
 static void help()
 {
     printf("Usage: bin2asm [OPTION...] FILE\n\n"
-           "  --offet=NUM                     Skip NUM bytes of input\n"
+           "  --offset=NUM                    Skip NUM bytes of input\n"
            "  --length=NUM                    Process at most NUM bytes of input\n"
            "  --output=FILE                   Write output to FILE\n"
            "  --help                          Give this help list\n"
