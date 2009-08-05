@@ -1,3 +1,20 @@
+/*
+    This file is part of bin2asm.
+
+    bin2asm is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    bin2asm is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with bin2asm.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,6 +49,26 @@ static void version()
 {
     printf("%s\n", program_version);
     exit(0);
+}
+
+long bin2asm(FILE *in, FILE *out, long length)
+{
+    long i = 0;
+    int ch = fgetc(in);
+    while ((ch != -1) && ((length == -1) || (i < length))) {
+        int m = (i % 16);
+        if (m == 0)
+            fwrite(".db ", 1, 4, out);
+        else
+            fputc(',', out);
+        fprintf(out, "$%.2X", ch);
+        if (m == 15)
+            fputc('\n', out);
+        ch = fgetc(in);
+        ++i;
+    }
+    fputc('\n', out);
+    return i;
 }
 
 /**
@@ -94,22 +131,7 @@ int main(int argc, char **argv)
         }
         if (offset != -1)
             fseek(in, offset, SEEK_CUR);
-        long i = 0;
-        int col = 0;
-        int ch = fgetc(in);
-        while ((ch != -1) && ((length == -1) || (i < length))) {
-            int m = (i % 16);
-            if (m == 0)
-                fwrite(".db ", 1, 4, out);
-            else
-                fputc(',', out);
-            fprintf(out, "$%.2X", ch);
-            if (m == 15)
-                fputc('\n', out);
-            ch = fgetc(in);
-            ++i;
-        }
-        fputc('\n', out);
+        bin2asm(in, out, length);
         fclose(in);
         fclose(out);
     }
